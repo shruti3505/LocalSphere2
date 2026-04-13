@@ -1,0 +1,31 @@
+services:
+  database:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    build:
+      context: ./local-vendor-app
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb://database:27017/localvendor
+      - JWT_SECRET=your_jwt_secret_here
+    depends_on:
+      - database
+
+  frontend:
+    build:
+      context: ./localsphere-v3
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:
