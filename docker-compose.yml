@@ -1,0 +1,14 @@
+services:
+  backend:
+    build: ./local-vendor-app
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./local-vendor-app/.env
+
+  frontend:
+    build: ./localsphere-v3
+    ports:
+      - "3000:80"
+    stdin_open: true
+    tty: true
