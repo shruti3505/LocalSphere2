@@ -9,7 +9,7 @@ exports.negotiate = async (req, res) => {
       return res.status(400).json({ msg: 'Product not negotiable' });
 
     const minAllowed = product.price - (product.price * product.discountMax / 100);
-    const _maxAllowed = product.price - (product.price * product.discountMin / 100);
+    // const _maxAllowed = product.price - (product.price * product.discountMin / 100);
 
     if (offeredPrice >= minAllowed && offeredPrice <= product.price) {
       return res.json({
