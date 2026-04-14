@@ -1,9 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
-  // ✅ FIX: Handle both 'Bearer token' and raw token formats
   const authHeader = req.header('Authorization');
-  console.log('AUTH - Authorization header:', authHeader ? 'present' : 'MISSING');
 
   if (!authHeader) {
     return res.status(401).json({ msg: 'No token, access denied' });
@@ -18,8 +16,12 @@ module.exports = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('AUTH - decoded user id:', decoded.id);
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('❌ JWT_SECRET missing in auth middleware!');
+      return res.status(500).json({ msg: 'Server config error' });
+    }
+    const decoded = jwt.verify(token, secret);
     req.user = decoded;
     next();
   } catch (err) {

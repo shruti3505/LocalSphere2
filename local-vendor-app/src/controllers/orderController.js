@@ -9,7 +9,7 @@ const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id) && !String(i
 exports.placeOrder = async (req, res) => {
   try {
     const { vendor, vendorName, items, paymentMethod, totalAmount } = req.body;
-    console.log('PLACE ORDER - vendor:', vendor, 'items:', items?.length);
+ 
 
     let calculatedTotal = 0;
     const processedItems = [];

@@ -1,21 +1,26 @@
+// ✅ MUST be first line — loads .env before anything else
+require('dotenv').config();
+
 const express = require('express');
-const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
-dotenv.config();
+// Debug: confirm env vars are loaded
+console.log('🔍 ENV CHECK:');
+console.log('   PORT:', process.env.PORT);
+console.log('   MONGO_URI:', process.env.MONGO_URI);
+console.log('   JWT_SECRET:', process.env.JWT_SECRET ? '✅ loaded' : '❌ MISSING');
+
 connectDB();
 
 const app = express();
 
-// ✅ FIX 1: Explicit CORS config so Authorization header is never stripped
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// ✅ FIX 2: Increase body size limit to 10mb to allow base64 image uploads
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -31,4 +36,4 @@ app.use('/api/reviews', require('./routes/reviewRoutes'));
 app.get('/', (req, res) => res.send('LocalSphere API Running'));
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server on port ${PORT}`));

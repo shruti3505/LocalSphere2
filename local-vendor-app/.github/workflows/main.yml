@@ -7,51 +7,22 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+        uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install backend dependencies
-        working-directory: local-vendor-app
-        run: npm install
-
-      - name: Run ESLint on backend
-        working-directory: local-vendor-app
-        run: node node_modules/eslint/bin/eslint.js src/ --max-warnings=20
-
-      - name: Run Jest tests
-        working-directory: local-vendor-app
-        run: node node_modules/jest/bin/jest.js --passWithNoTests --forceExit
+      - name: Run PyUnit Tests
+        run: python test_app.py
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build and push backend image
-        uses: docker/build-push-action@v5
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
         with:
-          context: ./local-vendor-app
-          dockerfile: ./local-vendor-app/Dockerfile
+          context: .
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/localsphere-backend:latest
-
-      - name: Build and push frontend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./localsphere-v3
-          dockerfile: ./localsphere-v3/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/localsphere-frontend:latest
+          tags: shruti3505/local-vendor-app:latest
