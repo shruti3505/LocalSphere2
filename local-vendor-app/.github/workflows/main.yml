@@ -1,41 +1,34 @@
-name: CI/CD Pipeline
+name: LocalSphere CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
-  build-and-push:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          python-version: '3.x'
+          node-version: '18'
 
-      - name: Run PyUnit Tests
-        working-directory: local-vendor-app
-        run: python test_app.py
+      - name: Install & Test Backend
+        run: |
+          cd local-vendor-app
+          npm install
+          npm test
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Install & Test Frontend
+        run: |
+          cd localsphere-v3
+          npm install
+          npm test
 
-      - name: Build and push vendor backend
-        uses: docker/build-push-action@v5
-        with:
-          context: ./local-vendor-app
-          push: true
-          tags: shruti3505/local-vendor-app:latest
-
-      - name: Build and push frontend
-        uses: docker/build-push-action@v5
-        with:
-          context: ./localsphere-v3
-          push: true
-          tags: shruti3505/localsphere-v3:latest
+      - name: Verify Docker Build
+        run: |
+          docker build -t local-test-backend ./local-vendor-app
+          docker build -t local-test-frontend ./localsphere-v3
