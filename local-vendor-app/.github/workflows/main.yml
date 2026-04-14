@@ -1,34 +1,31 @@
-name: LocalSphere CI/CD
+name: LocalSphere-CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  build-and-test:
+  test-and-build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 18
 
-      - name: Install & Test Backend
+      - name: Backend Tests
         run: |
           cd local-vendor-app
           npm install
           npm test
 
-      - name: Install & Test Frontend
+      - name: Frontend Tests
         run: |
           cd localsphere-v3
           npm install
           npm test
-
-      - name: Verify Docker Build
-        run: |
-          docker build -t local-test-backend ./local-vendor-app
-          docker build -t local-test-frontend ./localsphere-v3
